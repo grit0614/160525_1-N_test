@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @posts = Post.all
+    @posts = Post.all.reverse
     @replies = Reply.all
   end
   
@@ -8,9 +8,12 @@ class HomeController < ApplicationController
     post = Post.new
     post.title = params[:title]
     post.content = params[:content]
-    post.save
     
-    redirect_to root_url
+    if post.save
+      redirect_to root_url
+    else
+      render text: post.errors.messages[:title].first
+    end
   end
   
   def reply_write

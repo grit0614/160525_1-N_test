@@ -7,17 +7,39 @@
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
 
+
 <% @posts.each do |p| %>
-    <div class="well">
-      <h4 style="font-weight:bold;"><%=p.title%></h4>
-      <h5><%=p.content%></h5>
+  <div class="well">
+    <h4 style="font-weight:bold;"><%=p.title%></h4>
+    <h5><%=p.content%></h5>
+    <div class="reply_content_<%=p.id%>">
       <% p.replies.each do |r| %>
         <h6><%= r.content %></h6>
       <% end %>
-      <form action="/home/reply_write" method="POST">
-        <input type="hidden" value="<%=p.id%>" name="reply_id">
-        <input type="text" class="form-control" id="content" name="content">
-        <button type="submit" class="btn btn-default">Submit</button>
-      </form>
     </div>
+    <input type="text" class="form-control" id="content_<%=p.id%>" name="content">
+    <button value="<%=p.id%>" type="submit" class="btn btn-default reply_submit">Submit</button>
+  </div>
 <% end %>
+
+
+<script>
+$(".reply_submit").click(function(){
+  post_id = this.value;
+  content = $("#content_" + post_id).val();
+  
+  $.ajax({
+    method: "POST",
+    url: "/home/reply_write",
+    data: { reply_id: post_id, content: content },
+    success: function(){
+      $(".reply_content_" + post_id).append("<h6>" + content + "</h6>");
+      $("#content_" + post_id).val("");
+    },
+    error: function(){
+      alert( "리플이 작성되지 않았습니다" );
+    }
+  })
+  
+});
+</script>
